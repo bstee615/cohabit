@@ -1,4 +1,4 @@
-# Habit tracker
+# Habit tracker (tibah = reversed("habit"))
 
 Simple habit tracker built with HTMX/missing.style/Flask.
 

@@ -1,0 +1,31 @@
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <style>
+    .row-item {
+      text-align: center;
+    }
+    .counter {
+      font-size: 30px;
+    }
+    .counter-button {
+      font-size: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="airy fullscreen center">
+    <ul class="f-row dense" role="list">
+      <li class="row-item">
+        <button class="counter-button" hx-post="/decrement" hx-trigger="click" hx-swap="innerHTML"
+          hx-target="#count-display">➖</button>
+      </li>
+      <li class="row-item"><span class="counter" id="count-display" hx-get="/count" hx-trigger="load,every 1s"
+          hx-swap="innerHTML">Loading...</span></li>
+      <li class="row-item">
+        <button class="counter-button" hx-post="/increment" hx-trigger="click" hx-swap="innerHTML"
+          hx-target="#count-display">➕</button>
+      </li>
+    </ul>
+</body>

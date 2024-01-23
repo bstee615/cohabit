@@ -5,9 +5,6 @@
     .row-item {
       text-align: center;
     }
-    .counter {
-      font-size: 30px;
-    }
     .counter-button {
       font-size: 50px;
     }
@@ -16,16 +13,19 @@
 
 <body>
   <main class="airy fullscreen center">
+    <big-screen class="dense"><h1>🍪Cookie time!🍪</h1></big-screen>
     <ul class="f-row dense" role="list">
       <li class="row-item">
-        <button class="counter-button" hx-post="/decrement" hx-trigger="click" hx-swap="innerHTML"
-          hx-target="#count-display">➖</button>
+        <button class="counter-button" hx-post="/delete" hx-trigger="click" hx-swap="innerHTML"
+          hx-target="#count-display">😔</button>
       </li>
-      <li class="row-item"><span class="counter" id="count-display" hx-get="/count" hx-trigger="load,every 1s"
-          hx-swap="innerHTML">Loading...</span></li>
       <li class="row-item">
-        <button class="counter-button" hx-post="/increment" hx-trigger="click" hx-swap="innerHTML"
-          hx-target="#count-display">➕</button>
+        <div id="count-display" hx-get="/count" hx-trigger="load,every 1s"
+          hx-swap="innerHTML">Loading...</div>
+      </li>
+      <li class="row-item">
+        <button class="counter-button" hx-post="/add" hx-trigger="click" hx-swap="innerHTML"
+          hx-target="#count-display">🥰</button>
       </li>
     </ul>
 </body>

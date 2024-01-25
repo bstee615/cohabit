@@ -1,6 +1,7 @@
-# Habit tracker (tibah = reversed("habit"))
+# Cohabit - collaborative habit tracker
 
-Simple habit tracker built with HTMX/missing.style/Flask.
+Simple app to track habits with friends.
+Built with HTMX/missing.style/Flask.
 
 ![Screenshot of the web interface](./screenshot.png)
 

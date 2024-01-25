@@ -45,10 +45,16 @@ def get_days_in_a_row(data):
     # newest to oldest
     days_in_a_row = 0
     today = get_today()
-    for record in reversed(data):        
+    for record in reversed(data):  
         if record["date"] == today:
             days_in_a_row += 1
             today = today - timedelta(days=1)
+    if days_in_a_row == 0:
+        today = get_today() - timedelta(days=1)
+        for record in reversed(data):  
+            if record["date"] == today:
+                days_in_a_row += 1
+                today = today - timedelta(days=1)
     return days_in_a_row
 
 def get_status(db):
@@ -57,7 +63,10 @@ def get_status(db):
     days = get_days_in_a_row(db)
     if days == 0:
         message = "Shame"
-    return f"""<div>{message}! We've kept our habit up for the last {days} days.</div><div class="box">Did it on:<ul class="f-col dense" role="list">{lis}</ul></div>"""
+    suffix = ""
+    if len(db) > 0 and db[-1]["date"] != get_today():
+        suffix = " Do it today!"
+    return f"""<div>{message}! We've kept our habit up for the last {days} days.{suffix}</div><div class="box">Did it on:<ul class="f-col dense" role="list">{lis}</ul></div>"""
 
 @app.route("/count", methods = ["GET"])
 def count():

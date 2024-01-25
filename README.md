@@ -8,5 +8,6 @@ Built with HTMX/missing.style/Flask.
 To run:
 
 ```bash
+pip install -r requirements.txt # one-time
 python serve.py
 ```

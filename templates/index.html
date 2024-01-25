@@ -17,7 +17,7 @@
     <ul class="f-row dense" role="list">
       <li class="row-item">
         <button class="counter-button" hx-post="/delete" hx-trigger="click" hx-swap="innerHTML"
-          hx-target="#count-display">😔</button>
+          hx-target="#count-display" title="Remove habit completion for today...">😔</button>
       </li>
       <li class="row-item">
         <div id="count-display" hx-get="/count" hx-trigger="load,every 1s"
@@ -25,7 +25,7 @@
       </li>
       <li class="row-item">
         <button class="counter-button" hx-post="/add" hx-trigger="click" hx-swap="innerHTML"
-          hx-target="#count-display">🥰</button>
+          hx-target="#count-display" title="Mark habit as completed today!">🥰</button>
       </li>
     </ul>
 </body>

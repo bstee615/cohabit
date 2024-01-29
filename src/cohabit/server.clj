@@ -8,7 +8,7 @@
             [clj-time.coerce :as coerce])
   (:import (java.io FileNotFoundException)))
 
-(def database-fname "resources/database/database.json")
+;; Database
 (def date-format (fmt/formatters :date))
 
 (defn read-database [fname]
@@ -25,6 +25,7 @@
 (defn write-database [fname data]
   (spit fname (json/generate-string (map #(update % :date (fn [arg] (str arg))) data))))
 
+;; Date crunching
 (defn get-today []
   (time/today))
 
@@ -46,6 +47,9 @@
         message (if (zero? days) "Shame" "Yay us")
         suffix (if (and (not-empty data) (not= today (coerce/to-local-date ((last (sort-by :date data)) :date)))) " Do it today!" "")]
     (str "<div>" message "! We've kept our habit up for the last " days " days." suffix "</div>")))
+
+;; Server and application state
+(def database-fname "resources/database/database.json")
 
 (defn handler-home [_]
   {:status 200
@@ -84,17 +88,18 @@
     (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now))
     (req :uri))))
 
+;; TODO: use websockets instead of polling
+;; https://http-kit.github.io/server.html#websocket
+;; https://github.com/hashrocket/websocket-shootout/blob/master/clojure/httpkit/src/websocket/server.clj
 (defn -main []
-  (do
-    (println "Listening at 0.0.0.0:5000...")
-    (http/run-server
-      (fn [req]
-        (do 
-          (print-request req)
-          (case (:uri req)
-            "/" (handler-home req)
-            "/count" (handler-count req)
-            "/add" (handler-add req)
-            "/delete" (handler-delete req)
-            {:status 404 :body "Not found"})))
-      {:port 5000})))
+  (println "Listening at 0.0.0.0:5000...")
+  (http/run-server
+   (fn [req]
+     (print-request req)
+     (case (:uri req)
+       "/" (handler-home req)
+       "/count" (handler-count req)
+       "/add" (handler-add req)
+       "/delete" (handler-delete req)
+       {:status 404 :body "Not found"}))
+   {:port 5000}))

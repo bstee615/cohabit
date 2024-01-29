@@ -1,7 +1,7 @@
 ;;;; This namespace holds the server and application state.
 
 (ns cohabit.server
-  (:require [cohabit.date-crunching :refer :all]
+  (:require [cohabit.date-crunching :refer [get-status get-today read-database write-database]]
             [org.httpkit.server :as http]
             [clj-time.core :as time]
             [clj-time.format :as fmt]))

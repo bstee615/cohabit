@@ -49,7 +49,7 @@
   (let [days (get-streak data today)
         message (if (zero? days) "Shame" "Yay us")
         suffix (if (and (not-empty data) (not= today (coerce/to-local-date ((last (sort-by :date data)) :date)))) " Do it today!" "")]
-    (str "<div>"
+    (str "<div id=\"status\">"
          "<div>" message "! We've kept our habit up for the last " days " days." suffix "</div>"
          "<ul class=\"f-col dense\" role=\"list\">"
          (string/join "" (map #(str "<li>" (% :date) "</li>") data))

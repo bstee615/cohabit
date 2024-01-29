@@ -5,6 +5,7 @@ The backend for the Cohabit app.
 ## Usage
 
 - Run server with logs: `bash serve.sh`
+- Install dependencies: `lein deps`
 - Run server: `lein run`
 - Run tests: `lein test`
 

@@ -1,5 +1,7 @@
 (ns cohabit.server
-  (:require [org.httpkit.server :as http]
+  (:require [clojure.java.io :as io]
+            [clojure.string :as str]
+            [org.httpkit.server :as http]
             [cheshire.core :as json]
             [clj-time.core :as time]
             [clj-time.format :as fmt]
@@ -45,7 +47,7 @@
 
 (defn handler-home [_]
   {:status 200
-   :headers {"Content-Type" "text/html"}
+   :headers {"Content-Type" "text/html; charset=utf-8"}
    :body (slurp "resources/public/index.html")})
 
 (defn handler-count [_]

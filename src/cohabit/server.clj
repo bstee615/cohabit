@@ -75,13 +75,22 @@
      :headers {"Content-Type" "text/html"}
      :body (get-status updated-db)}))
 
+(defn print-request [req]
+  (println (format "[%s] Got request: %s"
+    (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now))
+    (req :uri))))
+
 (defn -main []
-  (http/run-server
-   (fn [req]
-     (case (:uri req)
-       "/" (handler-home req)
-       "/count" (handler-count req)
-       "/add" (handler-add req)
-       "/delete" (handler-delete req)
-       {:status 404 :body "Not found"}))
-   {:port 5000}))
+  (do
+    (println "Listening at 0.0.0.0:5000...")
+    (http/run-server
+      (fn [req]
+        (do 
+          (print-request req)
+          (case (:uri req)
+            "/" (handler-home req)
+            "/count" (handler-count req)
+            "/add" (handler-add req)
+            "/delete" (handler-delete req)
+            {:status 404 :body "Not found"})))
+      {:port 5000})))

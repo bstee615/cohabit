@@ -16,21 +16,21 @@
       {:date today}
       {:date (time/minus today (time/days 1))}
       {:date (time/minus today (time/days 2))}
-      ]))
+      ]) (time/today))
         3)))
   (testing "broken streak"
     (is (= (get-days-in-a-row (let [today (time/today)] [
       {:date today}
       {:date (time/minus today (time/days 2))}
       {:date (time/minus today (time/days 3))}
-      ]))
+      ]) (time/today))
         1)))
   (testing "not-started streak"
     (is (= (get-days-in-a-row (let [today (time/today)] [
       {:date (time/minus today (time/days 1))}
       {:date (time/minus today (time/days 2))}
       {:date (time/minus today (time/days 3))}
-      ]))
+      ]) (time/today))
         0))))
 
 (deftest database

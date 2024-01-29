@@ -28,21 +28,23 @@
 (defn get-today []
   (time/today))
 
-(defn get-days-in-a-row [data]
-  (let [today (time/today)]
-    (reduce (fn [counter record]
-              (if (= 
-                    (time/minus today (time/days counter))
-                    (coerce/to-local-date (record :date)))
-                (inc counter)
-                (reduced counter)))
-            0
-            data)))
+(defn get-days-in-a-row [data today]
+  (reduce (fn [counter record]
+    (if
+      (=
+        (time/minus today (time/days counter))
+        (coerce/to-local-date (record :date)))
+      (inc counter)
+      (reduced counter)))
+    0
+    data))
 
-(defn get-status [db]
-  (let [days (get-days-in-a-row db)
+(defn get-status [data today]
+  (let [days (if (zero? (get-days-in-a-row data today))
+              (get-days-in-a-row data (time/minus today (time/days 1)))
+              (get-days-in-a-row data today))
         message (if (zero? days) "Shame" "Yay us")
-        suffix (if (and (not-empty db) (not= (get-today) (coerce/to-local-date ((last (sort-by :date db)) :date)))) " Do it today!" "")]
+        suffix (if (and (not-empty data) (not= today (coerce/to-local-date ((last (sort-by :date data)) :date)))) " Do it today!" "")]
     (str "<div>" message "! We've kept our habit up for the last " days " days." suffix "</div>")))
 
 (defn handler-home [_]
@@ -51,9 +53,11 @@
    :body (slurp "resources/public/index.html")})
 
 (defn handler-count [_]
-  {:status 200
-   :headers {"Content-Type" "text/html"}
-   :body (get-status (read-database database-fname))})
+  (let [db (read-database database-fname)
+        today (get-today)]
+    {:status 200
+     :headers {"Content-Type" "text/html"}
+     :body (get-status db today)}))
 
 (defn handler-add [_]
   (let [db (read-database database-fname)
@@ -64,7 +68,7 @@
     (write-database database-fname updated-db)
     {:status 200
      :headers {"Content-Type" "text/html"}
-     :body (get-status updated-db)}))
+     :body (get-status updated-db today)}))
 
 (defn handler-delete [_]
   (let [db (read-database database-fname)
@@ -73,7 +77,7 @@
     (write-database database-fname updated-db)
     {:status 200
      :headers {"Content-Type" "text/html"}
-     :body (get-status updated-db)}))
+     :body (get-status updated-db today)}))
 
 (defn print-request [req]
   (println (format "[%s] Got request: %s"

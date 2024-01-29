@@ -1,0 +1,9 @@
+{
+    "calva.replConnectSequences": [
+        {
+            "name": "cohabit",
+            "projectType": "Leiningen",
+            "autoSelectForJackIn": true,
+        }
+    ]
+}

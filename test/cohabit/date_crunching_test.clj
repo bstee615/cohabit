@@ -1,6 +1,6 @@
-(ns cohabit.server-test
+(ns cohabit.date-crunching-test
   (:require [clojure.test :refer :all]
-            [cohabit.server :refer :all]
+            [cohabit.date-crunching :refer :all]
             [clj-time.core :as time]
             [clj-time.coerce :as coerce]))
 

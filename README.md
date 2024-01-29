@@ -9,6 +9,18 @@ The backend for the Cohabit app.
 - Run server: `lein run`
 - Run tests: `lein test`
 
+## Usage with nginx reverse proxy
+
+Websockets require some extra configuration when hosted behind an nginx proxy. Add these lines to the `location` block inside the nginx configuration for your site:
+
+```conf
+location / {
+  # other lines...
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "Upgrade";
+}
+```
+
 ## License
 
 Copyright © 2024 Benjamin Steenhoek

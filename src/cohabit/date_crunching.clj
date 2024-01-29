@@ -12,7 +12,8 @@
 (def date-format (fmt/formatters :date))
 
 (defn read-database [fname]
-  (try
+  (locking fname
+   (try
     (let [file-content (slurp fname)]
       (reverse
         (sort-by :date
@@ -20,10 +21,12 @@
             #(update % :date
               (fn [arg] (coerce/to-local-date (fmt/parse date-format arg))))
             (json/parse-string file-content true)))))
-    (catch FileNotFoundException _ (spit fname "[]") [])))
+    (catch FileNotFoundException _ (spit fname "[]") []))))
 
 (defn write-database [fname data]
-  (spit fname (json/generate-string (map #(update % :date (fn [arg] (str arg))) data))))
+  (locking fname
+    (spit fname
+          (json/generate-string (map #(update % :date (fn [arg] (str arg))) data)))))
 
 ;;; Date crunching
 (defn get-today []

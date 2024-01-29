@@ -1,0 +1,32 @@
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+      .row-item {
+        text-align: center;
+      }
+      .counter-button {
+        font-size: 50px;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <main class="airy fullscreen center">
+      <big-screen class="dense"><h1>🍪Cookie time!🍪</h1></big-screen>
+      <ul class="f-row dense" role="list">
+        <li class="row-item">
+          <button class="counter-button" hx-post="/delete" hx-trigger="click" hx-swap="innerHTML"
+            hx-target="#count-display" title="Remove habit completion for today...">😔</button>
+        </li>
+        <li class="row-item">
+          <div id="count-display" hx-get="/count" hx-trigger="load,every 1s"
+            hx-swap="innerHTML">Loading...</div>
+        </li>
+        <li class="row-item">
+          <button class="counter-button" hx-post="/add" hx-trigger="click" hx-swap="innerHTML"
+            hx-target="#count-display" title="Mark habit as completed today!">🥰</button>
+        </li>
+      </ul>
+  </body>
+  

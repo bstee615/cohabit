@@ -1,13 +1,24 @@
-# Cohabit - collaborative habit tracker
+# cohabit-backend
 
-Simple app to track habits with friends.
-Built with HTMX/missing.style/Flask.
+The backend for the Cohabit app.
 
-![Screenshot of the web interface](./screenshot.png)
+## Usage
 
-To run:
+- Run server with logs: `bash serve.sh`
+- Run server: `lein run`
+- Run tests: `lein test`
 
-```bash
-pip install -r requirements.txt # one-time
-python serve.py
-```
+## License
+
+Copyright © 2024 Benjamin Steenhoek
+
+This program and the accompanying materials are made available under the
+terms of the Eclipse Public License 2.0 which is available at
+http://www.eclipse.org/legal/epl-2.0.
+
+This Source Code may also be made available under the following Secondary
+Licenses when the conditions for such availability set forth in the Eclipse
+Public License, v. 2.0 are satisfied: GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or (at your
+option) any later version, with the GNU Classpath Exception which is available
+at https://www.gnu.org/software/classpath/license.html.

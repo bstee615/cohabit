@@ -1,6 +1,6 @@
-# cohabit-backend
+# cohabit
 
-The backend for the Cohabit app.
+Collaborative habit tracker
 
 ## Usage
 

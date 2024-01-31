@@ -1,0 +1,7 @@
+- [x] Login page and authentication
+- [ ] Use timer to notify clients of date change at midnight
+- [ ] Calendar display widget
+- [ ] Indicate when your pal is online
+- [ ] Allow displaying multiple habits in a list
+- [ ] Add footer to pages
+- [ ] Interactive navbar

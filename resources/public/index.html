@@ -1,9 +1,15 @@
 <!doctype html>
+<html class="-no-dark-theme">
 <head>
   <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.1">
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
   <style>
+    .navbar nav {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     .row-item {
       text-align: center;
     }
@@ -14,8 +20,17 @@
 </head>
 
 <body>
-  <main class="airy fullscreen center">
-    <big-screen class="dense"><h1>🍪Cookie time!🍪</h1></big-screen>
+  <header class="navbar">
+    <nav>
+      <ul role="list">
+        <li><a href="/">Habits</a>
+        <li><a href="/login">Login</a>
+        <li><a href="/logout">Logout</a>
+      </ul>
+    </nav>
+  </header>
+  <main class="airy center">
+    <h1>🍪Cookie time!🍪</h1>
     <div hx-ext="ws" ws-connect="/ws">
       <ul class="f-row dense" role="list">
         <li class="row-item">
@@ -33,3 +48,5 @@
       </ul>
     </div>
 </body>
+</html>
+

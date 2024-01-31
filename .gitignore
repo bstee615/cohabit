@@ -13,8 +13,9 @@ pom.xml.asc
 .hgignore
 .hg/
 
-database.*
 *.log
 .clj-kondo/
 .lsp/
 .calva/
+
+resources/database/

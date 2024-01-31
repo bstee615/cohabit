@@ -2,12 +2,34 @@
 
 (ns cohabit.server
   (:require [cohabit.date-crunching :refer [get-status get-today read-database write-database]]
+            [buddy.auth :refer [authenticated? throw-unauthorized]]
+            [buddy.auth.backends.session :refer [session-backend]]
+            [buddy.auth.middleware :refer (wrap-authentication wrap-authorization)]
+            [buddy.hashers :as hashers]
+            [ring.middleware.params :refer [wrap-params]]
+            [ring.middleware.session :refer [wrap-session]]
             [org.httpkit.server :as http]
             [clj-time.core :as time]
             [clj-time.format :as fmt]
             [cheshire.core :as json]))
 
 (def database-fname "resources/database/database.json")
+
+;;; Authentication
+
+(def users {"admin" {:username "admin"
+                     :hashed-password (hashers/derive "adminpass")}
+                    ;;  :roles #{:user :admin}}
+                     
+            "foo@abc.com"  {:username "foo@abc.com"
+                     :hashed-password (hashers/derive "hunter2")}})
+                    ;;  :roles #{:user}}})
+                     
+
+(defn lookup-user [username password]
+  (when-let [user (get users username)] ; TODO: use a database
+    (when (hashers/verify password (get user :hashed-password))
+      (dissoc user :hashed-password))))
 
 ;;; Websocket state
 (defonce channels (atom #{}))
@@ -30,32 +52,32 @@
   (http/send! ch (json/encode {:type "error" :payload "ERROR: unknown message type"})))
 
 ;;; Websocket handlers
-(defn ws-status [ch payload]
+(defn ws-status [ch _]
   (reply ch (let [db (read-database database-fname)
                   today (get-today)]
               {:status 200
                :headers {"Content-Type" "text/html"}
                :body (get-status db today)})))
 
-(defn ws-add [ch payload]
+(defn ws-add [_ _]
   (broadcast (let [db (read-database database-fname)
-        today (get-today)
-        updated-db (if (not (some #(= today (% :date)) db))
-                      (conj db {:date today})
-                      db)]
-    (write-database database-fname updated-db)
-    {:status 200
-     :headers {"Content-Type" "text/html"}
-     :body (get-status updated-db today)})))
+                   today (get-today)
+                   updated-db (if (not (some #(= today (% :date)) db))
+                                 (conj db {:date today})
+                                 db)]
+              (write-database database-fname updated-db)
+              {:status 200
+               :headers {"Content-Type" "text/html"}
+               :body (get-status updated-db today)})))
 
-(defn ws-remove [ch payload]
+(defn ws-remove [_ _]
   (broadcast (let [db (read-database database-fname)
-        today (get-today)
-        updated-db (remove #(= today (% :date)) db)]
-    (write-database database-fname updated-db)
-    {:status 200
-     :headers {"Content-Type" "text/html"}
-     :body (get-status updated-db today)})))
+                   today (get-today)
+                   updated-db (remove #(= today (% :date)) db)]
+              (write-database database-fname updated-db)
+              {:status 200
+               :headers {"Content-Type" "text/html"}
+               :body (get-status updated-db today)})))
 
 (defn log-ws [ch payload handler]
   (println (format "[%s] Got websocket request on channel %s, dispatching to %s: %s"
@@ -75,30 +97,75 @@
     (handler ch payload)))
 
 ;;; HTTP handlers
-(defn handler-ws [request]
-  (http/with-channel request channel
-    (connect! channel)
-    (http/on-close channel #(disconnect! channel %))
-    (http/on-receive channel #(dispatch channel %))))
+#_{:clj-kondo/ignore [:unresolved-symbol]}
+(defn handler-ws [req]
+  (if (authenticated? req)
+    (http/with-channel req channel
+      (connect! channel)
+      (http/on-close channel #(disconnect! channel %))
+      (http/on-receive channel #(dispatch channel %)))
+    (throw-unauthorized)))
 
-(defn handler-home [_]
+(defn handler-home [req]
+  (if (authenticated? req)
+    {:status 200
+     :headers {"Content-Type" "text/html; charset=utf-8"}
+     :body (slurp "resources/public/index.html")}
+    (throw-unauthorized)))
+
+(defn handler-login [_]
   {:status 200
    :headers {"Content-Type" "text/html; charset=utf-8"}
-   :body (slurp "resources/public/index.html")})
+   :body (slurp "resources/public/login.html")})
+
+; To unsign jws token to string: (apply str (map char (jws/unsign "<encoded-token>" secret)))
+(defn handler-authenticate [{{username "username" password "password" next "next"} :params
+                             session :session}]
+  (if-let [user (lookup-user username password)]
+    {:status 302
+     :headers {"Location" (or next "/")}
+     :session (assoc session :identity user)}
+    (throw-unauthorized)))
+
+(defn handler-logout [{session :session}]
+  (-> {:status 302
+       :headers {"Location" "/"}
+       :session (dissoc session :identity)}))
 
 ;; Entry point
 (defn log-http [req]
   (println (format "[%s] Got HTTP request: %s"
-    (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now))
-    (req :uri))))
+            (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now))
+            (req :uri))))
+
+(defn handler-main [req]
+  (log-http req)
+  (case (:uri req)
+    ; Public routes
+    "/login" (handler-login req)
+    "/logout" (handler-logout req)
+    "/login-authenticate" (handler-authenticate req)
+    ; Secured routes
+    "/" (handler-home req)
+    "/ws" (handler-ws req)
+    {:status 404 :body "Not found"}))
+
+(defn handler-unauthorized
+  [request _]
+  (let [current-url (:uri request)]
+    {:status 302
+     :headers {"Location" (format "/login?next=%s" current-url)}}))
+
+(def backend (session-backend {:unauthorized-handler handler-unauthorized}))
+
+(def app (-> handler-main
+             (wrap-authentication backend)
+             (wrap-authorization backend)
+             wrap-params
+             wrap-session))
 
 (defn -main []
   (println "Listening at 0.0.0.0:5000...")
   (http/run-server
-   (fn [req]
-     (log-http req)
-     (case (:uri req)
-       "/" (handler-home req)
-       "/ws" (handler-ws req)
-       {:status 404 :body "Not found"}))
+   #'app
    {:port 5000}))

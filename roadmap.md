@@ -1,0 +1,3 @@
+- [ ] Login page and authentication
+- [ ] Use timer to notify clients of date change at midnight
+- [ ] Calendar display widget

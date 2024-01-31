@@ -17,12 +17,17 @@
 
 (def database-fname "resources/database/database.json")
 
+(defn- hash-password [user]
+  (dissoc
+   (assoc user
+    :hashed-password (hashers/derive (user :password)))
+   :password))
+
 ;;; Authentication
-(def users {"admin" {:username "admin"
-                     :hashed-password (hashers/derive "adminpass")}
-                     
-            "foo@abc.com"  {:username "foo@abc.com"
-                     :hashed-password (hashers/derive "hunter2")}})
+(def users (into {} (map
+                     (juxt :username #(select-keys % [:hashed-password]))
+                     (map hash-password
+                          (json/parse-string (slurp "resources/database/users.json") true)))))
 
 (defn lookup-user [username password]
   (when-let [user (get users username)] ; TODO: use a database

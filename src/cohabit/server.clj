@@ -144,6 +144,7 @@
 
 (def backend (session-backend {:unauthorized-handler handler-unauthorized}))
 
+#_{:clj-kondo/ignore [:unresolved-symbol]}
 (defroutes app-routes
   (GET "/" [] handler-home)
   (GET "/ws" [] handler-ws)

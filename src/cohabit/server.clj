@@ -2,6 +2,8 @@
 
 (ns cohabit.server
   (:require [cohabit.date-crunching :refer [get-status get-today read-database write-database]]
+            [compojure.core :refer :all]
+            [compojure.route :as route]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
             [buddy.auth.backends.session :refer [session-backend]]
             [buddy.auth.middleware :refer (wrap-authentication wrap-authorization)]
@@ -16,15 +18,11 @@
 (def database-fname "resources/database/database.json")
 
 ;;; Authentication
-
 (def users {"admin" {:username "admin"
                      :hashed-password (hashers/derive "adminpass")}
-                    ;;  :roles #{:user :admin}}
                      
             "foo@abc.com"  {:username "foo@abc.com"
                      :hashed-password (hashers/derive "hunter2")}})
-                    ;;  :roles #{:user}}})
-                     
 
 (defn lookup-user [username password]
   (when-let [user (get users username)] ; TODO: use a database
@@ -138,18 +136,6 @@
             (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now))
             (req :uri))))
 
-(defn handler-main [req]
-  (log-http req)
-  (case (:uri req)
-    ; Public routes
-    "/login" (handler-login req)
-    "/logout" (handler-logout req)
-    "/login-authenticate" (handler-authenticate req)
-    ; Secured routes
-    "/" (handler-home req)
-    "/ws" (handler-ws req)
-    {:status 404 :body "Not found"}))
-
 (defn handler-unauthorized
   [request _]
   (let [current-url (:uri request)]
@@ -158,11 +144,19 @@
 
 (def backend (session-backend {:unauthorized-handler handler-unauthorized}))
 
-(def app (-> handler-main
-             (wrap-authentication backend)
+(defroutes app-routes
+  (GET "/" [] handler-home)
+  (GET "/ws" [] handler-ws)
+  (GET "/login" [] handler-login)
+  (POST "/login" [] handler-authenticate)
+  (GET "/logout" [] handler-logout)
+  (route/not-found "<h1>Page not found</h1>"))
+
+(def app (-> app-routes
              (wrap-authorization backend)
-             wrap-params
-             wrap-session))
+             (wrap-authentication backend)
+             wrap-session
+             wrap-params))
 
 (defn -main []
   (println "Listening at 0.0.0.0:5000...")

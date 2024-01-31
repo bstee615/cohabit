@@ -150,6 +150,7 @@
   (GET "/login" [] handler-login)
   (POST "/login" [] handler-authenticate)
   (GET "/logout" [] handler-logout)
+  (route/files "/" {:root "resources/public"})
   (route/not-found "<h1>Page not found</h1>"))
 
 (def app (-> app-routes

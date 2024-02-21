@@ -48,13 +48,40 @@
     (get-days-in-a-row data (time/minus today (time/days 1)))
     (get-days-in-a-row data today)))
 
+(defn fill-blank-dates [dates today]
+  (let [first-date (time/first-day-of-the-month- today)
+        days-before-first-day (mod (time/day-of-week first-date) 7)
+        blank {:class "" :date ""}]
+    (concat
+     (repeat days-before-first-day blank)
+     dates)))
+
+(defn get-dates-in-month [today]
+  (let [last-date (time/day (time/last-day-of-the-month- today))]
+    (range 1 (+ last-date 1))))
+
+;; match dates with data and fill data into dates, such as whether we did cookie time on that date
+(defn decorate-dates [dates data today]
+  (let [active-dates (zipmap (map #(% :date) data) data)]
+    (map (fn [date]
+           {:class (string/join " " [(if (contains? active-dates date)
+                                      "active"
+                                      "")
+                                    (if (= date today)
+                                      "today"
+                                      "")])
+            :date (time/day date)})
+         (map #(time/nth-day-of-the-month today %) dates))))
+
 (defn get-status [data today]
   (let [days (get-streak data today)
         message (if (zero? days) "Shame" "Yay us")
-        suffix (if (and (not-empty data) (not= today (coerce/to-local-date ((last (sort-by :date data)) :date)))) " Do it today!" "")]
+        suffix (if (and (not-empty data) (not= today (coerce/to-local-date ((last (sort-by :date data)) :date)))) " Do it today!" "")
+        dates (fill-blank-dates (decorate-dates (get-dates-in-month today) data today) today)]
     (str "<div id=\"status\">"
          "<div>" message "! We've kept our habit up for the last " days " days." suffix "</div>"
-         "<ul class=\"f-col dense\" role=\"list\">"
-         (string/join "" (map #(str "<li>" (% :date) "</li>") data))
-         "</ul>"
+         "<div class=\"calendar\" role=\"list\">"
+         "<span class=\"day-of-week\">Sun</span><span class=\"day-of-week\">Mon</span><span class=\"day-of-week\">Tue</span><span class=\"day-of-week\">Wed</span><span class=\"day-of-week\">Thu</span><span class=\"day-of-week\">Fri</span><span class=\"day-of-week\">Sat</span>"
+         (string/join "" (map #(str "<span><div class=\""(% :class)"\">"(% :date)"</div></span>") dates))
+         "</div>"
          "</div>")))

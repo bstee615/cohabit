@@ -9,12 +9,39 @@
       margin-left: auto;
       margin-right: auto;
     }
-
     .row-item {
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .counter-button {
       font-size: 50px;
+    }
+    .calendar {
+      display: flex;
+      flex-wrap: wrap;
+      border: 4px solid #553311;
+      border-radius: 10px;
+      overflow: hidden;
+      user-select: none;
+    }
+    .calendar .day-of-week {
+      background-color: #aa7733;
+      padding: 10px;
+      color: white
+    }
+    .calendar span {
+      flex-basis: 14.2857142857%;
+    }
+    .calendar div {
+      border: 4px solid transparent;
+    }
+    .calendar .active {
+      background-color: #eecc77;
+    }
+    .calendar .today {
+      border: 4px dotted #553311;
     }
   </style>
 </head>
@@ -47,6 +74,15 @@
         </li>
       </ul>
     </div>
+    <!-- <div>
+      <h2>Test calendar</h2>
+      <div class="calendar">
+        <span class="day-of-week">Sun</span><span class="day-of-week">Mon</span><span class="day-of-week">Tue</span><span class="day-of-week">Wed</span><span class="day-of-week">Thu</span><span class="day-of-week">Fri</span><span class="day-of-week">Sat</span>
+        <span></span><span></span><span></span><span></span><span>1</span><span>2</span><span>3</span>
+        <span class="active">4</span><span>5</span><span class="active">6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+        <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
+      </div>
+    </div> -->
 </body>
 </html>
 

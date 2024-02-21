@@ -2,10 +2,10 @@
 - [ ] Use timer to notify clients of date change at midnight
 - [ ] Re-update clients when they reconnect to the websocket
 - [ ] Allow displaying multiple habits in a list
-- [ ] Calendar display widget
 - [ ] Indicate when your pal is online
 - [ ] Interactive navbar
 - [ ] Add footer to pages
 - [ ] Add favicon attribution <a href="https://www.flaticon.com/free-icons/cookie" title="cookie icons">Cookie icons created by Freepik - Flaticon</a>
+- [x] Calendar display widget
 - [/] Use a "real" database -- too complex/inflexible!
 - [x] Login page and authentication

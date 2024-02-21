@@ -10,6 +10,7 @@
 
 ;;; Database
 (def date-format (fmt/formatters :date))
+(def month-year-format (fmt/formatter "MMMM yyyy"))
 
 (defn read-database [fname]
   (locking fname
@@ -81,6 +82,7 @@
     (str "<div id=\"status\">"
          "<div>" message "! We've kept our habit up for the last " days " days." suffix "</div>"
          "<div class=\"calendar\" role=\"list\">"
+         "<span class=\"month-year-banner\">"(fmt/unparse-local-date month-year-format today)"</span>"
          "<span class=\"day-of-week\">Sun</span><span class=\"day-of-week\">Mon</span><span class=\"day-of-week\">Tue</span><span class=\"day-of-week\">Wed</span><span class=\"day-of-week\">Thu</span><span class=\"day-of-week\">Fri</span><span class=\"day-of-week\">Sat</span>"
          (string/join "" (map #(str "<span><div class=\""(% :class)"\">"(% :date)"</div></span>") dates))
          "</div>"

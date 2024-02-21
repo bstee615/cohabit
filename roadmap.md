@@ -1,7 +1,11 @@
-- [x] Login page and authentication
+- [ ] Use fixed salt for buddy hashers
 - [ ] Use timer to notify clients of date change at midnight
+- [ ] Re-update clients when they reconnect to the websocket
+- [ ] Allow displaying multiple habits in a list
 - [ ] Calendar display widget
 - [ ] Indicate when your pal is online
-- [ ] Allow displaying multiple habits in a list
-- [ ] Add footer to pages
 - [ ] Interactive navbar
+- [ ] Add footer to pages
+- [ ] Add favicon attribution <a href="https://www.flaticon.com/free-icons/cookie" title="cookie icons">Cookie icons created by Freepik - Flaticon</a>
+- [/] Use a "real" database -- too complex/inflexible!
+- [x] Login page and authentication

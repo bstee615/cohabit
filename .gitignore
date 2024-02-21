@@ -19,3 +19,5 @@ pom.xml.asc
 .calva/
 
 resources/database/
+mysql-shell-8.3.0-linux-glibc2.28-x86-64bit/
+mysql-shell-8.3.0-linux-glibc2.28-x86-64bit.tar.gz

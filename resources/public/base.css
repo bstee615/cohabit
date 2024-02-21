@@ -1,0 +1,41 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+}
+
+.content {
+    margin: auto;
+}
+
+.navbar nav {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.row-item {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.disabled,.disabled * {
+    color: gray;
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
+}

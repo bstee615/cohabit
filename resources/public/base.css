@@ -41,5 +41,6 @@ main {
 }
 
 footer .powered-by-icon {
-    height:1em;
+    height: 1em;
+    width: 1em;
 }

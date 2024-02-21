@@ -39,3 +39,7 @@ main {
     cursor: default;
     text-decoration: none;
 }
+
+footer .powered-by-icon {
+    height:1em;
+}

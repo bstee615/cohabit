@@ -74,11 +74,12 @@
             :date (time/day date)})
          (map #(time/nth-day-of-the-month today %) dates))))
 
-(defn get-status [data today]
+(defn get-status [data today clients]
   (let [days (get-streak data today)
         message (if (zero? days) "Shame" "Yay us")
         suffix (if (and (not-empty data) (not= today (coerce/to-local-date ((last (sort-by :date data)) :date)))) " Do it today!" "")
-        dates (fill-blank-dates (decorate-dates (get-dates-in-month today) data today) today)]
+        dates (fill-blank-dates (decorate-dates (get-dates-in-month today) data today) today)
+        now-online (map #(% :username) clients)]
     (str "<div id=\"status\">"
          "<div>" message "! We've kept our habit up for the last " days " days." suffix "</div>"
          "<div class=\"calendar\" role=\"list\">"
@@ -86,4 +87,7 @@
          "<span class=\"day-of-week\">Sun</span><span class=\"day-of-week\">Mon</span><span class=\"day-of-week\">Tue</span><span class=\"day-of-week\">Wed</span><span class=\"day-of-week\">Thu</span><span class=\"day-of-week\">Fri</span><span class=\"day-of-week\">Sat</span>"
          (string/join "" (map #(str "<span><div class=\""(% :class)"\">"(% :date)"</div></span>") dates))
          "</div>"
-         "</div>")))
+         "</div>"
+         "<ul id=\"now-online-row\" class=\"f-row dense\" role=\"list\" hx-swap=\"innerHTML\">"
+         (string/join "" (map #(str "<li class=\"now-online\">" % "</li>") now-online))
+         "</ul>")))

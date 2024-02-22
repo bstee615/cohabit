@@ -28,7 +28,7 @@
 
 ;;; Authentication
 (def users (into {} (map
-                     (juxt :username #(select-keys % [:hashed-password]))
+                     (juxt :username #(select-keys % [:username :hashed-password]))
                      (map hash-password
                           (json/parse-string (slurp "resources/database/users.json") true)))))
 
@@ -38,21 +38,24 @@
       (dissoc user :hashed-password))))
 
 ;;; Websocket state
-(defonce channels (atom #{}))
+(defonce clients (atom #{}))
 
-(defn connect! [channel]
-  (println (format "[%s] Connecting client %s", (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now)) channel))
-  (swap! channels conj channel))
+(defn connect! [channel identity]
+  (println (format "IDENTITY: %s" identity))
+  (let [channel {:channel channel :username (identity :username)}]
+    (println (format "[%s] Connecting client %s", (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now)) channel))
+    (swap! clients conj channel)))
 
-(defn disconnect! [channel _]
-  (println (format "[%s] Disconnecting client %s", (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now)) channel))
-  (swap! channels disj channel))
+(defn disconnect! [channel _ identity]
+  (let [channel {:channel channel :username (identity :username)}]
+    (println (format "[%s] Disconnecting client %s", (fmt/unparse (fmt/formatters :date-hour-minute-second) (time/now)) channel))
+    (swap! clients disj channel)))
 
 (defn reply [ch payload]
   (http/send! ch (payload :body)))
 
 (defn broadcast [payload]
-  (mapv #(do (reply % payload)) @channels))
+  (mapv #(do (reply % payload)) (map #(% :channel) @clients)))
 
 (defn unknown-type-response [ch _]
   (http/send! ch (json/encode {:type "error" :payload "ERROR: unknown message type"})))
@@ -63,7 +66,7 @@
                   today (get-today)]
               {:status 200
                :headers {"Content-Type" "text/html"}
-               :body (get-status db today)})))
+               :body (get-status db today @clients)})))
 
 (defn ws-add [_ _]
   (broadcast (let [db (read-database database-fname)
@@ -74,7 +77,7 @@
               (write-database database-fname updated-db)
               {:status 200
                :headers {"Content-Type" "text/html"}
-               :body (get-status updated-db today)})))
+               :body (get-status updated-db today @clients)})))
 
 (defn ws-remove [_ _]
   (broadcast (let [db (read-database database-fname)
@@ -83,7 +86,7 @@
               (write-database database-fname updated-db)
               {:status 200
                :headers {"Content-Type" "text/html"}
-               :body (get-status updated-db today)})))
+               :body (get-status updated-db today @clients)})))
 
 (defn log-ws [ch payload handler]
   (println (format "[%s] Got websocket request on channel %s, dispatching to %s: %s"
@@ -105,10 +108,16 @@
 ;;; HTTP handlers
 #_{:clj-kondo/ignore [:unresolved-symbol]}
 (defn handler-ws [req]
+  ;; (println req)
   (if (authenticated? req)
     (http/with-channel req channel
-      (connect! channel)
-      (http/on-close channel #(disconnect! channel %))
+      (connect! channel (req :identity))
+      (broadcast (let [db (read-database database-fname)
+                       today (get-today)]
+                   {:status 200
+                    :headers {"Content-Type" "text/html"}
+                    :body (get-status db today @clients)}))
+      (http/on-close channel #(disconnect! channel % (req :identity)))
       (http/on-receive channel #(dispatch channel %)))
     (throw-unauthorized)))
 

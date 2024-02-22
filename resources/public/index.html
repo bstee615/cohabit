@@ -41,6 +41,11 @@
     .calendar .today {
       border: 4px dotted #553311;
     }
+    .now-online {
+      background-color: #eecc77;
+      border-radius: 10px;
+      padding: 10px;
+    }
   </style>
 </head>
 
@@ -63,12 +68,14 @@
         </li>
         <li class="row-item">
           <!-- workaround https://github.com/bigskysoftware/htmx/issues/2141#issuecomment-1904120545 -->
-          <div id="status" ws-send hx-trigger="load delay:1ms" hx-ext="debug">Loading...</div>
+          <div id="status" ws-send hx-trigger="load delay:1ms">Loading...</div>
         </li>
         <li class="row-item">
           <button class="counter-button" id="add" ws-send hx-trigger="click"
             title="Mark habit as completed today!">🥰</button>
         </li>
+      </ul>
+      <ul id="now-online-row" class="f-row dense" role="list" hx-swap="innerHTML">
       </ul>
     </div>
   </main>

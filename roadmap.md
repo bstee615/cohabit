@@ -3,8 +3,8 @@
 - [ ] Re-update clients when they reconnect to the websocket
 - [ ] Allow displaying multiple habits in a list
 - [ ] Indicate when your pal is online
-- [ ] Interactive navbar
-- [ ] Add footer to pages
+- [x] Interactive navbar
+- [x] Add footer to pages
 - [x] Add favicon attribution <a href="https://www.flaticon.com/free-icons/cookie" title="cookie icons">Cookie icons created by Freepik - Flaticon</a>
 - [x] Calendar display widget
 - [/] Use a "real" database -- too complex/inflexible!

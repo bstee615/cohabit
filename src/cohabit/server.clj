@@ -17,6 +17,9 @@
 
 (def database-fname "resources/database/database.json")
 
+;; (def mysalt (-> "resources/database/salt.bin" io/file .toPath java.nio.file.Files/readAllBytes))
+;; (with-open [out (output-stream (file "resources/database/salt.bin"))] (.write out mybytes))
+
 (defn- hash-password [user]
   (dissoc
    (assoc user
